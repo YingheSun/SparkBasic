@@ -1,1 +1,2 @@
-pyspark exercise
+# SparkBasic
+basic Spark exercises
