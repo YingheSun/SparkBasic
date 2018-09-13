@@ -7,13 +7,13 @@ from pyspark.mllib.evaluation import BinaryClassificationMetrics
 from time import time
 import pandas as pd
 
-sc = SparkContext("local")
+sc = SparkContext()
 impurltyList = ['gini','entropy']
-maxDepthList = [3,5,10,15,20,25,30]
+maxDepthList = [10,15,20,30]
 # maxDepthList = [3]
-maxBinsList = [3,5,10,50,100,200]
+maxBinsList = [3,5,10,50]
 # maxBinsList = [3]
-treeNumList = [10,20,50,100,1000]
+treeNumList = [250,200,150,300]
 # treeNumList = [10]
 
 
@@ -93,10 +93,11 @@ def trainEvaluateModel(trainData, validationData, impurityParam, maxDepthParam, 
     AUC = evaluateModel(model,validationData)
     durintation = time() - startTime
     print 'durintation' + str(durintation)
-    return (AUC, impurityParam, maxDepthParam, maxBinsParam, model)
+    return (AUC, impurityParam, maxDepthParam, maxBinsParam,treeNum, model)
+    # return (AUC, impurityParam, maxDepthParam, maxBinsParam, model)
 
 
-def evalBestParams(trainData, validationData, impurltyList, maxDepthList, maxBinsList,treeNumList):
+def evalBestParams(trainData, validationData, impurltyList, maxDepthList, maxBinsList,treeNumList=[]):
     # metrics = [trainEvaluateModel(trainData, validationData, impurity, maxDepth, maxBins) for impurity in impurltyList
     #            for maxDepth in maxDepthList for maxBins in maxBinsList]
     metrics = [trainEvaluateModel(trainData, validationData, impurity, maxDepth, maxBins,treeNum) for impurity in impurltyList
@@ -104,7 +105,8 @@ def evalBestParams(trainData, validationData, impurltyList, maxDepthList, maxBin
 
     smetrlcs = sorted(metrics,key=lambda k: k[0],reverse= True)
 
-    df = pd.DataFrame(smetrlcs, columns=["AUC", "impurityParam", "maxDepthParam", "maxBinsParam","model"])
+    # df = pd.DataFrame(smetrlcs, columns=["AUC", "impurityParam", "maxDepthParam", "maxBinsParam","model"])
+    df = pd.DataFrame(smetrlcs, columns=["AUC", "impurityParam", "maxDepthParam", "maxBinsParam","treeNum","model"])
     print df
 
 

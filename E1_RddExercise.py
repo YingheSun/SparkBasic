@@ -1,6 +1,6 @@
 from pyspark import SparkContext
 import random
-sc = SparkContext("local")
+sc = SparkContext()
 
 def random_int_list(start, stop, length):
   start, stop = (int(start), int(stop)) if start <= stop else (int(stop), int(start))
