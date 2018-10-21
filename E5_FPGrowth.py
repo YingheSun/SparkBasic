@@ -46,7 +46,7 @@ def getUserViews():
     for i in range(days):
         extra_condation = ' and timestrap between ' + str(startTime+i*84600) +' and '+  str(startTime+i*84600+84600) if (startTime+i*84600+84600) < endTime else str(endTime)
         pvDF = sqlContext.sql(
-            "select userID,concat_ws(' ',collect_set(itemId)) as user_view from user_behavior where behavierType = 'pv' "+extra_condation+" group by userId")
+            "select userID,concat_ws(' ',collect_set(itemId)) as user_view from user_behavior where behavierType != 'pv' "+extra_condation+" group by userId")
         if pvDF.count():
             retList += pvDF.rdd.map(lambda p: p['user_view'].split(" ")).collect()
 
@@ -55,7 +55,7 @@ def getUserViews():
 if __name__ == '__main__':
     df = prepareData(sc)
     df.registerTempTable('user_behavior')
-    df.cache()
     pvRDD = sc.parallelize(getUserViews(),2)
+    pvRDD.persist()
     model = FPGrowth.train(pvRDD,minSupport=MIN_SUPPORT, numPartitions=NUM_PARTATION)
     print model.freqItemsets().collect()
